@@ -1,10 +1,20 @@
 from datetime import datetime, timezone
 from threading import Thread
 
+import sys
+from pathlib import Path
+
 import requests
 from flask import Flask, jsonify, render_template
 
-app = Flask(__name__)
+_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_ROOT / "ml"))
+
+app = Flask(
+    __name__,
+    template_folder=str(_ROOT / "frontend" / "templates"),
+    static_folder=str(_ROOT / "frontend" / "static"),
+)
 
 # prediction cache — avoid retraining on every request
 _prediction_cache: dict | None = None
