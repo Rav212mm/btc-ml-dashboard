@@ -133,4 +133,4 @@ def api_predict_reset():
 
 
 if __name__ == "__main__":
-    app.run(debug=False, port=5001)
+    app.run(debug=False, port=5002)

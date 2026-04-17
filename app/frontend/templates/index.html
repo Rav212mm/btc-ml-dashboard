@@ -10,16 +10,19 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:      #0d1117;
-      --surf:    #161b22;
-      --border:  #30363d;
-      --text:    #e6edf3;
-      --muted:   #8b949e;
-      --orange:  #f7931a;
-      --green:   #3fb950;
-      --red:     #f85149;
-      --blue:    #58a6ff;
-      --purple:  #bc8cff;
+      --bg:     #0d1117;
+      --surf:   #161b22;
+      --border: #30363d;
+      --text:   #e6edf3;
+      --muted:  #8b949e;
+      --orange: #f7931a;
+      --green:  #3fb950;
+      --red:    #f85149;
+      --blue:   #58a6ff;
+      --purple: #bc8cff;
+      --cyan:   #00d4ff;
+      --yellow: #f0c000;
+      --pink:   #ff7edb;
     }
 
     body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
@@ -59,7 +62,7 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── LAYOUT ── */
-    main { max-width: 1200px; margin: 0 auto; padding: 28px 18px; }
+    main { max-width: 1400px; margin: 0 auto; padding: 28px 18px; }
 
     /* ── AVG CARD ── */
     .avg-card {
@@ -106,20 +109,102 @@
       background: var(--surf); border: 1px solid var(--border);
       border-radius: 14px; padding: 22px;
     }
-    .chart-wrap { position: relative; height: 380px; }
 
-    /* legend */
-    .chart-legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; }
-    .leg-item { display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--muted); }
-    .leg-dot { width: 12px; height: 3px; border-radius: 2px; }
-
-    /* rmse pills */
-    .rmse-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
-    .rmse-pill {
-      font-size: .72rem; padding: 4px 12px; border-radius: 999px; font-weight: 600;
+    /* ── INDICATOR TOGGLES ── */
+    .ind-toggles { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .ind-btn {
+      font-size: .72rem; padding: 5px 13px; border-radius: 999px;
+      border: 1px solid var(--border); background: var(--bg);
+      color: var(--muted); cursor: pointer; transition: all .15s; font-weight: 600;
     }
+    .ind-btn:hover { filter: brightness(1.2); }
+    .ind-btn[data-group="ema"].active    { color: var(--cyan);   border-color: #00d4ff44; background: #00d4ff11; }
+    .ind-btn[data-group="bb"].active     { color: var(--pink);   border-color: #ff7edb44; background: #ff7edb11; }
+    .ind-btn[data-group="s2f"].active    { color: var(--orange); border-color: #f7931a44; background: #f7931a11; }
+    .ind-btn[data-group="logreg"].active { color: var(--green);  border-color: #3fb95044; background: #3fb95011; }
+
+    /* ── PRED LAYOUT: chart + gauge ── */
+    .pred-layout { display: flex; gap: 18px; align-items: flex-start; }
+    .chart-side  { flex: 1; min-width: 0; }
+
+    /* ── LEGEND ── */
+    .chart-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+    .leg-item { display: flex; align-items: center; gap: 6px; font-size: .72rem; color: var(--muted); }
+    .leg-dot  { width: 14px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+
+    /* ── MAIN CHART ── */
+    .chart-wrap { position: relative; height: 320px; }
+
+    /* ── MACD PANEL ── */
+    .macd-panel { margin-top: 10px; }
+    .macd-header { font-size: .68rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; display: flex; gap: 14px; align-items: center; }
+    .macd-leg { display: flex; align-items: center; gap: 5px; }
+    .macd-dot { width: 12px; height: 2px; border-radius: 1px; }
+    .macd-wrap { position: relative; height: 110px; }
+
+    /* ── RMSE PILLS ── */
+    .rmse-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .rmse-pill { font-size: .72rem; padding: 4px 12px; border-radius: 999px; font-weight: 600; }
     .rmse-lstm    { background: #1a2a3a; color: var(--blue); }
     .rmse-xgboost { background: #2a1a3a; color: var(--purple); }
+
+    /* ── GAUGE ── */
+    .gauge-side {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      background: var(--surf); border: 1px solid var(--border); border-radius: 14px;
+      padding: 20px 16px; width: 130px; flex-shrink: 0;
+    }
+    .gauge-title {
+      font-size: .68rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--muted); text-align: center; line-height: 1.4;
+    }
+    .gauge-track-wrap { display: flex; gap: 8px; align-items: stretch; }
+    .gauge-scale-labels {
+      display: flex; flex-direction: column; justify-content: space-between;
+      height: 300px; font-size: .62rem; color: var(--muted); text-align: right; line-height: 1;
+    }
+    .gauge-bar {
+      width: 36px; height: 300px; border-radius: 18px;
+      background: linear-gradient(to bottom,
+        #3fb950 0%,
+        #7dc840 18%,
+        #f0c000 50%,
+        #ff8c00 75%,
+        #f85149 100%);
+      position: relative; box-shadow: 0 0 24px rgba(0,0,0,.6), inset 0 0 8px rgba(0,0,0,.3);
+      border: 1px solid var(--border);
+    }
+    .gauge-needle {
+      position: absolute; left: -12px; right: -12px; height: 4px;
+      background: #fff; border-radius: 2px;
+      box-shadow: 0 0 10px rgba(255,255,255,.8), 0 0 4px rgba(255,255,255,1);
+      transition: top .9s cubic-bezier(.34,1.56,.64,1);
+      top: 50%;
+    }
+    .gauge-tick {
+      position: absolute; left: 0; right: 0; height: 1px;
+      background: rgba(0,0,0,.25);
+    }
+    .gauge-score-val {
+      font-size: 1.9rem; font-weight: 800; text-align: center;
+      transition: color .5s;
+    }
+    .gauge-verdict {
+      font-size: .65rem; font-weight: 700; padding: 4px 8px; border-radius: 999px;
+      text-align: center; width: 100%; transition: all .5s; line-height: 1.3;
+    }
+    .gauge-divider { width: 80%; height: 1px; background: var(--border); }
+    .gauge-components { width: 100%; }
+    .gauge-comp-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: .6rem; padding: 3px 0; border-bottom: 1px solid #21262d;
+    }
+    .gauge-comp-row:last-child { border-bottom: none; }
+    .gauge-comp-name { color: var(--muted); }
+    .gauge-comp-score { font-weight: 700; }
+    .gc-pos { color: var(--green); }
+    .gc-neg { color: var(--red); }
+    .gc-neu { color: var(--muted); }
 
     /* prediction status */
     #predict-status {
@@ -154,21 +239,18 @@
 <main>
   <div id="err-banner" class="err-banner"></div>
 
-  <!-- avg price -->
   <div class="avg-card">
     <div class="lbl">Średnia cena BTC (3 źródła)</div>
     <div class="price" id="avg-price">—</div>
     <div class="sub" id="avg-sub">Kliknij „Odśwież dane" aby pobrać aktualne kursy</div>
   </div>
 
-  <!-- source cards -->
   <div class="cards" id="cards"></div>
 
-  <!-- prediction section -->
   <div class="section-header">
     <div>
       <div class="section-title">📈 Predykcja ceny BTC — 4 miesiące do przodu</div>
-      <div class="section-meta" id="predict-meta">Modele: LSTM (sieć rekurencyjna) · XGBoost (gradient boosting)</div>
+      <div class="section-meta" id="predict-meta">Modele: LSTM · XGBoost · wskaźniki techniczne</div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
       <button class="btn btn-blue" id="train-btn" onclick="startPrediction()">
@@ -180,7 +262,6 @@
     </div>
   </div>
 
-  <!-- chart or status -->
   <div id="predict-area">
     <div id="predict-status">
       <div class="big">🤖</div>
@@ -254,14 +335,61 @@ async function refreshPrices(){
   }
 }
 
-// ── prediction chart ──────────────────────────────────────────────────────────
-let chartInstance = null;
+// ── chart instances ───────────────────────────────────────────────────────────
+let chartInstance     = null;
+let macdChartInstance = null;
 
+// dataset index → group mapping for toggles
+const IND_GROUPS = {
+  ema:    [3, 4, 5],
+  bb:     [6, 7, 8],
+  s2f:    [9],
+  logreg: [10, 11, 12],
+};
+
+function toggleGroup(group, btn){
+  const wasActive = btn.classList.contains("active");
+  btn.classList.toggle("active");
+  if(!chartInstance) return;
+  IND_GROUPS[group].forEach(i => {
+    if(chartInstance.data.datasets[i])
+      chartInstance.data.datasets[i].hidden = wasActive;
+  });
+  chartInstance.update("none");
+}
+
+// ── gauge ─────────────────────────────────────────────────────────────────────
+function updateGauge(score){
+  const needle  = document.getElementById("gauge-needle");
+  const scoreEl = document.getElementById("gauge-score");
+  const verdEl  = document.getElementById("gauge-verdict");
+  if(!needle) return;
+
+  // +100 = top (0%), -100 = bottom (100%)
+  const pct = (100 - score) / 200;
+  needle.style.top = `calc(${pct * 100}% - 2px)`;
+
+  const sign = score >= 0 ? "+" : "";
+  scoreEl.textContent = sign + score;
+
+  let label, bg, col;
+  if      (score >= 60)  { label="MOCNY KUP";     bg="#0a2e10"; col="var(--green)";  }
+  else if (score >= 20)  { label="KUP";            bg="#0a2e10"; col="var(--green)";  }
+  else if (score >= -20) { label="NEUTRALNIE";     bg="#2a2608"; col="var(--yellow)"; }
+  else if (score >= -60) { label="SPRZEDAJ";       bg="#2e0a0a"; col="var(--red)";    }
+  else                   { label="MOCNA SPRZEDAŻ"; bg="#2e0a0a"; col="var(--red)";    }
+
+  verdEl.textContent      = label;
+  verdEl.style.background = bg;
+  verdEl.style.color      = col;
+  scoreEl.style.color     = col;
+}
+
+// ── main chart renderer ───────────────────────────────────────────────────────
 function renderChart(data){
-  const area = document.getElementById("predict-area");
-
-  // last 60 days of history for readability
+  const area      = document.getElementById("predict-area");
   const HIST_SHOW = 60;
+
   const histDates  = data.history.dates.slice(-HIST_SHOW);
   const histPrices = data.history.prices.slice(-HIST_SHOW);
   const predDates  = data.predictions.dates;
@@ -269,145 +397,301 @@ function renderChart(data){
   const xgbPrices  = data.predictions.xgboost.prices;
   const lstmRMSE   = data.predictions.lstm.rmse;
   const xgbRMSE    = data.predictions.xgboost.rmse;
+  const ind        = data.indicators || {};
 
-  // combine dates
   const allDates = [...histDates, ...predDates];
   const histLen  = histDates.length;
+  const predLen  = predDates.length;
 
-  // pad arrays so they align on the same x-axis
-  const histFull = [...histPrices, ...Array(predDates.length).fill(null)];
-  const lstmFull = [...Array(histLen - 1).fill(null), histPrices[histLen-1], ...lstmPrices];
-  const xgbFull  = [...Array(histLen - 1).fill(null), histPrices[histLen-1], ...xgbPrices];
+  // pad historical-only indicator to full allDates length
+  const padH = arr => [
+    ...(arr ? arr.slice(-HIST_SHOW) : Array(HIST_SHOW).fill(null)),
+    ...Array(predLen).fill(null),
+  ];
+
+  // S2F spans hist + future
+  const s2fFull = [
+    ...(ind.s2f_hist   || []).slice(-HIST_SHOW),
+    ...(ind.s2f_pred   || []),
+  ];
+  // Log regression spans hist + future
+  const lrFull   = [...(ind.log_reg_hist    || []).slice(-HIST_SHOW), ...(ind.log_reg_pred    || [])];
+  const lrUpFull = [...(ind.log_reg_up_hist || []).slice(-HIST_SHOW), ...(ind.log_reg_up_pred || [])];
+  const lrDnFull = [...(ind.log_reg_dn_hist || []).slice(-HIST_SHOW), ...(ind.log_reg_dn_pred || [])];
+
+  // prediction series aligned to allDates
+  const histFull = [...histPrices, ...Array(predLen).fill(null)];
+  const lstmFull = [...Array(histLen-1).fill(null), histPrices[histLen-1], ...lstmPrices];
+  const xgbFull  = [...Array(histLen-1).fill(null), histPrices[histLen-1], ...xgbPrices];
+
+  // signal score
+  const score = typeof data.signal_score === "number" ? data.signal_score : 0;
 
   area.innerHTML = `
     <div class="chart-card">
-      <div class="chart-legend">
-        <div class="leg-item"><div class="leg-dot" style="background:#f7931a;height:3px"></div> Historia (ostatnie 60 dni)</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#58a6ff"></div> LSTM &nbsp;— predykcja</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#bc8cff"></div> XGBoost — predykcja</div>
-        <div class="leg-item"><div class="leg-dot" style="background:#ffffff44;height:1px;width:20px"></div> Dziś</div>
+
+      <!-- indicator toggles -->
+      <div class="ind-toggles">
+        <button class="ind-btn active" data-group="ema"    onclick="toggleGroup('ema',this)">EMA 21 / 50 / 200</button>
+        <button class="ind-btn active" data-group="bb"     onclick="toggleGroup('bb',this)">Bollinger Bands</button>
+        <button class="ind-btn active" data-group="s2f"    onclick="toggleGroup('s2f',this)">Stock-to-Flow</button>
+        <button class="ind-btn active" data-group="logreg" onclick="toggleGroup('logreg',this)">Log Regression</button>
       </div>
-      <div class="chart-wrap"><canvas id="pred-chart"></canvas></div>
+
+      <!-- chart + gauge layout -->
+      <div class="pred-layout">
+
+        <!-- chart side -->
+        <div class="chart-side">
+          <div class="chart-legend">
+            <div class="leg-item"><div class="leg-dot" style="background:#f7931a"></div>Historia</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--blue)"></div>LSTM</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--purple);border-top:1px dashed var(--purple)"></div>XGBoost</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--cyan)"></div>EMA 21</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--yellow)"></div>EMA 50</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#ffffff99"></div>EMA 200</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--pink)"></div>Bollinger</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--orange);opacity:.7"></div>S2F</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Log Reg</div>
+          </div>
+          <div class="chart-wrap"><canvas id="pred-chart"></canvas></div>
+
+          <!-- MACD panel -->
+          <div class="macd-panel">
+            <div class="macd-header">
+              MACD (12, 26, 9)
+              <span class="macd-leg"><div class="macd-dot" style="background:var(--blue)"></div>MACD</span>
+              <span class="macd-leg"><div class="macd-dot" style="background:var(--orange)"></div>Sygnał</span>
+              <span class="macd-leg"><div class="macd-dot" style="background:var(--green);width:8px;height:8px;border-radius:2px"></div>Histogram</span>
+            </div>
+            <div class="macd-wrap"><canvas id="macd-chart"></canvas></div>
+          </div>
+        </div>
+
+        <!-- gauge side -->
+        <div class="gauge-side">
+          <div class="gauge-title">Sygnał<br>rynkowy</div>
+          <div class="gauge-track-wrap">
+            <div class="gauge-scale-labels">
+              <span>+100</span><span>+50</span><span>0</span><span>-50</span><span>-100</span>
+            </div>
+            <div class="gauge-bar">
+              <!-- scale ticks at 25%, 50%, 75% -->
+              <div class="gauge-tick" style="top:25%"></div>
+              <div class="gauge-tick" style="top:50%"></div>
+              <div class="gauge-tick" style="top:75%"></div>
+              <div class="gauge-needle" id="gauge-needle"></div>
+            </div>
+          </div>
+          <div class="gauge-score-val" id="gauge-score">—</div>
+          <div class="gauge-verdict" id="gauge-verdict">—</div>
+          <div class="gauge-divider"></div>
+          <div class="gauge-components" id="gauge-components"></div>
+        </div>
+      </div>
+
+      <!-- RMSE pills -->
       <div class="rmse-row">
-        <span class="rmse-pill rmse-lstm">LSTM RMSE (test): ±${usd(lstmRMSE)}</span>
-        <span class="rmse-pill rmse-xgboost">XGBoost RMSE (test): ±${usd(xgbRMSE)}</span>
-        <span style="font-size:.7rem;color:var(--muted);align-self:center">Dane treningowe: ostatnie ${data.trained_on_days} dni z Binance</span>
+        <span class="rmse-pill rmse-lstm">LSTM RMSE: ±${usd(lstmRMSE)}</span>
+        <span class="rmse-pill rmse-xgboost">XGBoost RMSE: ±${usd(xgbRMSE)}</span>
+        <span style="font-size:.7rem;color:var(--muted);align-self:center">Dane: ${data.trained_on_days} dni · ${data.device||""}</span>
       </div>
     </div>`;
 
-  if(chartInstance){ chartInstance.destroy(); chartInstance=null; }
+  // destroy old instances
+  if(chartInstance)     { chartInstance.destroy();     chartInstance=null; }
+  if(macdChartInstance) { macdChartInstance.destroy(); macdChartInstance=null; }
 
+  // ── main chart ────────────────────────────────────────────────────────────
   const ctx = document.getElementById("pred-chart").getContext("2d");
-  chartInstance = new Chart(ctx,{
-    type:"line",
-    data:{
+  chartInstance = new Chart(ctx, {
+    type: "line",
+    data: {
       labels: allDates,
-      datasets:[
-        {
-          label:"Historia",
-          data: histFull,
-          borderColor:"#f7931a",
-          backgroundColor:"#f7931a22",
-          borderWidth:2,
-          pointRadius:0,
-          tension:0.3,
-          fill:true,
-          spanGaps:false,
-        },
-        {
-          label:"LSTM",
-          data: lstmFull,
-          borderColor:"#58a6ff",
-          backgroundColor:"#58a6ff11",
-          borderWidth:2,
-          borderDash:[],
-          pointRadius:0,
-          tension:0.4,
-          fill:false,
-          spanGaps:false,
-        },
-        {
-          label:"XGBoost",
-          data: xgbFull,
-          borderColor:"#bc8cff",
-          backgroundColor:"transparent",
-          borderWidth:2,
-          borderDash:[6,3],
-          pointRadius:0,
-          tension:0.4,
-          fill:false,
-          spanGaps:false,
-        },
+      datasets: [
+        // 0 · Historia
+        { label:"Historia", data:histFull, borderColor:"#f7931a", backgroundColor:"#f7931a1a",
+          borderWidth:2, pointRadius:0, tension:0.3, fill:true, spanGaps:false },
+        // 1 · LSTM
+        { label:"LSTM", data:lstmFull, borderColor:"#58a6ff", borderWidth:2,
+          pointRadius:0, tension:0.4, fill:false, spanGaps:false },
+        // 2 · XGBoost
+        { label:"XGBoost", data:xgbFull, borderColor:"#bc8cff", borderWidth:2,
+          borderDash:[6,3], pointRadius:0, tension:0.4, fill:false, spanGaps:false },
+        // 3 · EMA 21
+        { label:"EMA 21", data:padH(ind.ema21), borderColor:"#00d4ff",
+          borderWidth:1, pointRadius:0, tension:0, fill:false, spanGaps:true },
+        // 4 · EMA 50
+        { label:"EMA 50", data:padH(ind.ema50), borderColor:"#f0c000",
+          borderWidth:1.5, pointRadius:0, tension:0, fill:false, spanGaps:true },
+        // 5 · EMA 200
+        { label:"EMA 200", data:padH(ind.ema200), borderColor:"rgba(255,255,255,0.75)",
+          borderWidth:2, pointRadius:0, tension:0, fill:false, spanGaps:true },
+        // 6 · BB Upper
+        { label:"BB Upper", data:padH(ind.bb_upper), borderColor:"#ff7edb55",
+          borderWidth:1, borderDash:[3,3], pointRadius:0, fill:false, spanGaps:true },
+        // 7 · BB Mid
+        { label:"BB Mid", data:padH(ind.bb_mid), borderColor:"#ff7edb99",
+          borderWidth:1, borderDash:[2,4], pointRadius:0, fill:false, spanGaps:true },
+        // 8 · BB Lower — fills back to BB Upper (2 datasets above)
+        { label:"BB Lower", data:padH(ind.bb_lower), borderColor:"#ff7edb55",
+          borderWidth:1, borderDash:[3,3], pointRadius:0, fill:"-2",
+          backgroundColor:"#ff7edb0a", spanGaps:true },
+        // 9 · S2F fair value
+        { label:"S2F Fair Value", data:s2fFull, borderColor:"#f7931aaa",
+          borderWidth:1.5, borderDash:[8,4], pointRadius:0, fill:false, spanGaps:true },
+        // 10 · Log Regression centre
+        { label:"Log Regression", data:lrFull, borderColor:"#3fb950",
+          borderWidth:1.5, borderDash:[5,3], pointRadius:0, fill:false, spanGaps:true },
+        // 11 · Log Reg +2σ
+        { label:"Log Reg +2σ", data:lrUpFull, borderColor:"#3fb95055",
+          borderWidth:1, borderDash:[3,3], pointRadius:0, fill:false, spanGaps:true },
+        // 12 · Log Reg -2σ — fills to +2σ band (1 dataset above)
+        { label:"Log Reg -2σ", data:lrDnFull, borderColor:"#3fb95055",
+          borderWidth:1, borderDash:[3,3], pointRadius:0, fill:"-1",
+          backgroundColor:"#3fb9500a", spanGaps:true },
       ]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
+    options: {
+      responsive:true, maintainAspectRatio:false,
       interaction:{ mode:"index", intersect:false },
       plugins:{
         legend:{ display:false },
         tooltip:{
-          backgroundColor:"#161b22",
-          borderColor:"#30363d",
-          borderWidth:1,
-          titleColor:"#e6edf3",
-          bodyColor:"#8b949e",
+          backgroundColor:"#161b22", borderColor:"#30363d", borderWidth:1,
+          titleColor:"#e6edf3", bodyColor:"#8b949e",
+          filter: item => item.parsed.y !== null,
           callbacks:{
-            label: ctx => " "+ctx.dataset.label+": "+(ctx.parsed.y != null ? usd(ctx.parsed.y) : "—"),
+            label: ctx => ctx.parsed.y != null
+              ? " "+ctx.dataset.label+": "+usd(ctx.parsed.y) : null,
           }
         },
         annotation:{
           annotations:{
             todayLine:{
-              type:"line",
-              xMin: histDates[histLen-1],
-              xMax: histDates[histLen-1],
-              borderColor:"rgba(255,255,255,0.25)",
-              borderWidth:1,
-              borderDash:[4,4],
-              label:{
-                display:true,
-                content:"Dziś",
-                position:"start",
-                color:"rgba(255,255,255,0.4)",
-                font:{ size:11 },
-                backgroundColor:"transparent",
-              }
+              type:"line", xMin:histDates[histLen-1], xMax:histDates[histLen-1],
+              borderColor:"rgba(255,255,255,0.22)", borderWidth:1, borderDash:[4,4],
+              label:{ display:true, content:"Dziś", position:"start",
+                color:"rgba(255,255,255,0.35)", font:{size:11}, backgroundColor:"transparent" }
             }
           }
         }
       },
       scales:{
         x:{
-          ticks:{
-            color:"#8b949e", maxTicksLimit:12,
-            callback:(val,i)=> allDates[i] ? allDates[i].slice(0,7) : "",
-          },
+          ticks:{ color:"#8b949e", maxTicksLimit:12,
+            callback:(v,i)=> allDates[i] ? allDates[i].slice(0,7) : "" },
           grid:{ color:"#21262d" },
         },
         y:{
-          ticks:{ color:"#8b949e", callback: v=> "$"+(v>=1000?(v/1000).toFixed(0)+"K":v) },
+          ticks:{ color:"#8b949e",
+            callback: v => "$"+(v>=1000?(v/1000).toFixed(0)+"K":v) },
           grid:{ color:"#21262d" },
         }
       }
     }
   });
 
-  // show retrain button
-  document.getElementById("retrain-btn").style.display="inline-flex";
-  document.getElementById("train-btn").style.display="none";
-  document.getElementById("predict-meta").textContent =
-    `Wytrenowane na ${data.trained_on_days} dniach danych Binance · LSTM RMSE: ±${usd(lstmRMSE)} · XGBoost RMSE: ±${usd(xgbRMSE)}`;
+  // ── MACD chart ────────────────────────────────────────────────────────────
+  const macdHist   = (ind.macd_hist   || []).slice(-HIST_SHOW);
+  const macdLine   = (ind.macd_line   || []).slice(-HIST_SHOW);
+  const macdSignal = (ind.macd_signal || []).slice(-HIST_SHOW);
+  const barBg      = macdHist.map(v => v === null ? "transparent" : v >= 0 ? "#3fb95077" : "#f8514977");
+  const barBdr     = macdHist.map(v => v === null ? "transparent" : v >= 0 ? "#3fb950" : "#f85149");
+
+  const macdCtx = document.getElementById("macd-chart").getContext("2d");
+  macdChartInstance = new Chart(macdCtx, {
+    type:"bar",
+    data:{
+      labels: histDates,
+      datasets:[
+        { type:"bar",  label:"Histogram", data:macdHist,   backgroundColor:barBg, borderColor:barBdr, borderWidth:1 },
+        { type:"line", label:"MACD",      data:macdLine,   borderColor:"#58a6ff", borderWidth:1.5, pointRadius:0, tension:0, fill:false, spanGaps:true, order:1 },
+        { type:"line", label:"Signal",    data:macdSignal, borderColor:"#f7931a", borderWidth:1.5, pointRadius:0, tension:0, fill:false, spanGaps:true, order:2 },
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:"index", intersect:false },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{
+          backgroundColor:"#161b22", borderColor:"#30363d", borderWidth:1,
+          titleColor:"#e6edf3", bodyColor:"#8b949e",
+          filter: item => item.parsed.y !== null,
+          callbacks:{ label: ctx => ctx.parsed.y != null ? " "+ctx.dataset.label+": "+ctx.parsed.y.toFixed(0) : null }
+        }
+      },
+      scales:{
+        x:{ ticks:{ color:"#8b949e", maxTicksLimit:8, callback:(v,i)=>histDates[i]?histDates[i].slice(0,7):"" }, grid:{color:"#21262d"} },
+        y:{ ticks:{ color:"#8b949e", callback: v=>v.toFixed(0) }, grid:{color:"#21262d"} }
+      }
+    }
+  });
+
+  // ── gauge + score breakdown ───────────────────────────────────────────────
+  updateGauge(score);
+  renderGaugeComponents(data);
+
+  // update header
+  document.getElementById("retrain-btn").style.display  = "inline-flex";
+  document.getElementById("train-btn").style.display    = "none";
+  document.getElementById("predict-meta").textContent   =
+    `Wytrenowane na ${data.trained_on_days} dniach · LSTM ±${usd(lstmRMSE)} · XGBoost ±${usd(xgbRMSE)}`;
 }
 
-// ── polling for prediction ────────────────────────────────────────────────────
+// ── gauge component breakdown ─────────────────────────────────────────────────
+function renderGaugeComponents(data){
+  const el  = document.getElementById("gauge-components");
+  if(!el) return;
+  const ind = data.indicators || {};
+  const prices = data.history.prices;
+  const cur = prices[prices.length - 1];
+
+  function lastVal(arr){ return arr ? [...arr].reverse().find(v=>v!==null) : null; }
+  function scoreClass(s){ return s > 0 ? "gc-pos" : s < 0 ? "gc-neg" : "gc-neu"; }
+  function fmtS(s){ return (s>0?"+":"")+s; }
+
+  const rsi   = lastVal(ind.rsi);
+  const e200  = lastVal(ind.ema200);
+  const e50   = lastVal(ind.ema50);
+  const ml    = lastVal(ind.macd_line);
+  const ms    = lastVal(ind.macd_signal);
+  const sf    = lastVal(ind.s2f_hist);
+
+  // replicate backend scoring for display
+  let rsiS=0, emaS=0, macdS=0, s2fS=0;
+  if(rsi!==null){ if(rsi<=30) rsiS=25; else if(rsi>=70) rsiS=-25; else rsiS=Math.round(25*(50-rsi)/20); }
+  if(e200!==null) emaS += cur>e200 ? 20 : -20;
+  if(e50!==null)  emaS += cur>e50  ? 15 : -15;
+  if(ml!==null&&ms!==null){
+    if(ml>0&&ml>ms) macdS=25; else if(ml<0&&ml<ms) macdS=-25;
+    else if(ml>ms)  macdS=10; else macdS=-10;
+  }
+  if(sf&&sf>0){ const r=cur/sf; if(r<0.5) s2fS=15; else if(r<0.8) s2fS=8; else if(r<1.5) s2fS=0; else if(r<2.5) s2fS=-8; else s2fS=-15; }
+
+  const rows = [
+    ["RSI", rsi!==null ? rsi.toFixed(1) : "—", rsiS],
+    ["EMA 50/200", e50&&e200 ? (cur>e200&&cur>e50?"nad EMA":"pod EMA") : "—", emaS],
+    ["MACD", ml!==null ? ml.toFixed(0) : "—", macdS],
+    ["S2F", sf ? usd(sf) : "—", s2fS],
+  ];
+
+  el.innerHTML = rows.map(([name, val, s]) => `
+    <div class="gauge-comp-row">
+      <span class="gauge-comp-name">${name}</span>
+      <span class="gauge-comp-score ${scoreClass(s)}">${fmtS(s)}</span>
+    </div>`).join("");
+}
+
+// ── training UI & polling ─────────────────────────────────────────────────────
 let pollTimer = null;
 
 function showTrainingUI(){
   document.getElementById("predict-area").innerHTML = `
     <div id="predict-status">
       <div class="big">⚙️</div>
-      <p>Trening modeli LSTM i XGBoost w toku…<br>Pobieranie 2 lat danych z Binance, trenowanie sieci neuronowej i XGBoost.</p>
+      <p>Trening modeli LSTM i XGBoost w toku…<br>Pobieranie danych z Binance, obliczanie wskaźników technicznych.</p>
       <div class="progress-bar-wrap"><div class="progress-bar"></div></div>
       <p style="font-size:.75rem">To zajmie ok. 60–90 sekund. Strona odświeży się automatycznie.</p>
     </div>`;
@@ -416,16 +700,14 @@ function showTrainingUI(){
 async function pollPrediction(){
   try{
     const res = await fetch("/api/predict");
-    const d = await res.json();
+    const d   = await res.json();
     if(d.status==="ready"){
-      clearInterval(pollTimer);
-      pollTimer=null;
+      clearInterval(pollTimer); pollTimer=null;
       const spin=document.getElementById("train-spin");
       if(spin) spin.classList.remove("go");
       renderChart(d);
     } else if(d.error){
-      clearInterval(pollTimer);
-      pollTimer=null;
+      clearInterval(pollTimer); pollTimer=null;
       document.getElementById("predict-area").innerHTML=`
         <div id="predict-status"><div class="big">❌</div>
         <p style="color:var(--red)">${d.error}</p></div>`;
@@ -440,20 +722,21 @@ async function startPrediction(){
   const spin = document.getElementById("train-spin");
   btn.disabled=true; spin.classList.add("go");
   showTrainingUI();
-  await fetch("/api/predict");           // triggers background thread
+  await fetch("/api/predict");
   pollTimer = setInterval(pollPrediction, 3000);
 }
 
 async function retrain(){
   await fetch("/api/predict/reset");
-  document.getElementById("retrain-btn").style.display="none";
-  document.getElementById("train-btn").style.display="inline-flex";
+  document.getElementById("retrain-btn").style.display = "none";
+  document.getElementById("train-btn").style.display   = "inline-flex";
   document.getElementById("predict-area").innerHTML=`
     <div id="predict-status">
       <div class="big">🤖</div>
       <p>Kliknij <strong>Trenuj modele</strong> aby uruchomić ponowny trening.</p>
     </div>`;
-  if(chartInstance){ chartInstance.destroy(); chartInstance=null; }
+  if(chartInstance)     { chartInstance.destroy();     chartInstance=null; }
+  if(macdChartInstance) { macdChartInstance.destroy(); macdChartInstance=null; }
 }
 
 // init
